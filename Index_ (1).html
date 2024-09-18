@@ -1,0 +1,430 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprende la Sucesión de Fibonacci</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1, h2 {
+            color: #4a4a4a;
+        }
+        .section {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .question {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .answer {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .option {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .option:hover {
+            background-color: #f0f0f0;
+        }
+        .selected {
+            background-color: #e6f3ff;
+            border-color: #4a90e2;
+        }
+        .correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+        .game-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .drag-item {
+            width: 50px;
+            height: 50px;
+            background-color: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: move;
+            user-select: none;
+        }
+        .drop-zone {
+            width: 60px;
+            height: 60px;
+            border: 2px dashed #4a4a4a;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .flower-image {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            padding: 3px;
+            border-radius: 3px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+        }
+        #progress-bar-fill {
+            display: block;
+            height: 22px;
+            background-color: #659cef;
+            border-radius: 3px;
+            transition: width 500ms ease-in-out;
+        }
+        .history-buttons {
+            margin-top: 20px;
+        }
+        .history-button {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s;
+        }
+        .history-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Descubre la Sucesión de Fibonacci</h1>
+    
+    <div id="progress-bar">
+        <span id="progress-bar-fill" style="width: 0%;"></span>
+    </div>
+
+    <div id="content-section" class="section">
+        <!-- El contenido dinámico se insertará aquí -->
+    </div>
+
+    <div class="history-buttons">
+        <button id="prev-button" class="history-button" onclick="navigateHistory(-1)" disabled>Anterior</button>
+        <button id="next-button" class="history-button" onclick="navigateHistory(1)" disabled>Siguiente</button>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "¿Qué observas en la siguiente secuencia de números: 1, 1, 2, 3, 5, 8, 13, 21?",
+                options: [
+                    "Cada número es el doble del anterior",
+                    "Cada número es la suma de los dos anteriores",
+                    "Los números son aleatorios",
+                    "Cada número es primo"
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Si continuamos la secuencia, ¿cuál sería el siguiente número después del 21?",
+                options: [
+                    "29",
+                    "42",
+                    "34",
+                    "55"
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "Esta secuencia tiene un nombre especial. ¿Sabes cómo se llama?",
+                options: [
+                    "Secuencia de Pitágoras",
+                    "Sucesión de Fibonacci",
+                    "Serie de Euclides",
+                    "Progresión Aritmética"
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "¿En cuál de estas situaciones en la naturaleza NO se observa comúnmente la Sucesión de Fibonacci?",
+                options: [
+                    "En la disposición de los pétalos de las flores",
+                    "En las espirales de las conchas marinas",
+                    "En la forma en que crecen las hojas en algunas plantas",
+                    "En la distribución de las nubes en el cielo"
+                ],
+                correctAnswer: 3
+            }
+        ];
+
+        const gameStages = [
+            {
+                instruction: "Arrastra los números en el orden correcto para formar los primeros 5 números de la Sucesión de Fibonacci.",
+                numbers: [1, 2, 3, 1, 5],
+                correctOrder: [1, 1, 2, 3, 5]
+            },
+            {
+                instruction: "Ahora, continúa la secuencia con los siguientes 3 números.",
+                numbers: [13, 21, 8],
+                correctOrder: [8, 13, 21]
+            },
+            {
+                instruction: "¿Cuáles son los siguientes 2 números en la secuencia?",
+                numbers: [55, 34, 89],
+                correctOrder: [34, 55]
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let currentGameStage = 0;
+        let score = 0;
+        let history = [];
+        let historyIndex = -1;
+
+        function updateProgressBar() {
+            const progress = ((currentQuestionIndex + currentGameStage) / (questions.length + gameStages.length + 1)) * 100;
+            document.getElementById('progress-bar-fill').style.width = `${progress}%`;
+        }
+
+        function showQuestion() {
+            updateProgressBar();
+            const contentSection = document.getElementById('content-section');
+            if (currentQuestionIndex < questions.length) {
+                const question = questions[currentQuestionIndex];
+                let optionsHTML = '';
+                question.options.forEach((option, index) => {
+                    optionsHTML += `<div class="option" onclick="selectOption(this, ${index})">${option}</div>`;
+                });
+                contentSection.innerHTML = `
+                    <h2>Pregunta ${currentQuestionIndex + 1}</h2>
+                    <div class="question">${question.question}</div>
+                    <div class="options">${optionsHTML}</div>
+                    <button onclick="checkAnswer()" class="button" disabled id="submit-answer">Enviar Respuesta</button>
+                    <div id="answer" class="answer hidden"></div>
+                `;
+                history = [...history.slice(0, historyIndex + 1), 'question'];
+                historyIndex++;
+                toggleHistoryButtons();
+            } else {
+                setupGame();
+            }
+        }
+
+        function selectOption(optionElement, index) {
+            document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+            optionElement.classList.add('selected');
+            document.getElementById('submit-answer').disabled = false;
+        }
+
+        function checkAnswer() {
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) return;
+
+            const selectedIndex = Array.from(selectedOption.parentNode.children).indexOf(selectedOption);
+            const correctIndex = questions[currentQuestionIndex].correctAnswer;
+            const answerDiv = document.getElementById('answer');
+            
+            answerDiv.classList.remove('hidden');
+            if (selectedIndex === correctIndex) {
+                answerDiv.innerHTML = '¡Correcto! ' + questions[currentQuestionIndex].options[correctIndex];
+                selectedOption.classList.add('correct');
+                score++;
+            } else {
+                answerDiv.innerHTML = 'No es correcto. La respuesta correcta es: ' + questions[currentQuestionIndex].options[correctIndex];
+                selectedOption.classList.add('incorrect');
+                document.querySelectorAll('.option')[correctIndex].classList.add('correct');
+            }
+            
+            document.getElementById('submit-answer').disabled = true;
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                showQuestion();
+            }, 2000); // Reduce el tiempo a 2 segundos
+        }
+
+        function setupGame() {
+            updateProgressBar();
+            const contentSection = document.getElementById('content-section');
+            if (currentGameStage < gameStages.length) {
+                const stage = gameStages[currentGameStage];
+                contentSection.innerHTML = `
+                    <h2>Juego - Etapa ${currentGameStage + 1}</h2>
+                    <p id="game-instruction">${stage.instruction}</p>
+                    <div class="game-area">
+                        <div id="drag-items"></div>
+                        <div id="drop-zones"></div>
+                    </div>
+                    <button id="check-game-answer" class="button">Comprobar Respuesta</button>
+                    <p id="feedback"></p>
+                `;
+                history = [...history.slice(0, historyIndex + 1), 'game'];
+                historyIndex++;
+                toggleHistoryButtons();
+
+                const dragItems = document.getElementById('drag-items');
+                stage.numbers.forEach((num, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'drag-item';
+                    item.textContent = num;
+                    item.draggable = true;
+                    item.id = `item-${index}`;
+                    item.addEventListener('dragstart', drag);
+                    dragItems.appendChild(item);
+                });
+                
+                const dropZones = document.getElementById('drop-zones');
+                for (let i = 0; i < stage.correctOrder.length; i++) {
+                    const zone = document.createElement('div');
+                    zone.className = 'drop-zone';
+                    zone.id = `zone-${i}`;
+                    zone.addEventListener('dragover', allowDrop);
+                    zone.addEventListener('drop', drop);
+                    dropZones.appendChild(zone);
+                }
+
+                document.getElementById('check-game-answer').addEventListener('click', checkGameAnswer);
+            } else {
+                showSummary();
+            }
+        }
+
+        function drag(ev) {
+            ev.dataTransfer.setData("text", ev.target.id);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        function drop(ev) {
+            ev.preventDefault();
+            const data = ev.dataTransfer.getData("text");
+            ev.target.appendChild(document.getElementById(data));
+        }
+
+        function checkGameAnswer() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            const userOrder = Array.from(dropZones).map(zone => parseInt(zone.textContent) || null);
+            const correctOrder = gameStages[currentGameStage].correctOrder;
+            
+            const feedback = document.getElementById('feedback');
+            if (JSON.stringify(userOrder) === JSON.stringify(correctOrder)) {
+                feedback.textContent = '¡Correcto! Avanzando al siguiente nivel.';
+                score++;
+                currentGameStage++;
+                setTimeout(() => {
+                    setupGame();
+                }, 2000); // Reduce el tiempo a 2 segundos
+            } else {
+                feedback.textContent = 'No es correcto. Intenta de nuevo. Recuerda que cada número es la suma de los dos anteriores.';
+            }
+        }
+
+        function showSummary() {
+            updateProgressBar();
+            const contentSection = document.getElementById('content-section');
+            const totalQuestions = questions.length + gameStages.length;
+            const percentage = (score / totalQuestions) * 100;
+            
+            contentSection.innerHTML = `
+                <h2>Resumen de tu Aprendizaje</h2>
+                <p>Has completado el juego de aprendizaje de la Sucesión de Fibonacci.</p>
+                <p>Tu puntuación: ${score} de ${totalQuestions}</p>
+                <p>Porcentaje de aciertos: ${percentage.toFixed(2)}%</p>
+                <h3>Conceptos clave aprendidos:</h3>
+                <ul>
+                    <li>La Sucesión de Fibonacci comienza con 1, 1 y luego cada número es la suma de los dos anteriores.</li>
+                    <li>Los primeros números de la sucesión son: 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, ...</li>
+                    <li>Esta secuencia aparece en muchos patrones naturales, como en las flores y las conchas.</li>
+                </ul>
+                <p>¡Sigue explorando las matemáticas en la naturaleza!</p>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Fibonacci_spiral_34.svg/1920px-Fibonacci_spiral_34.svg.png" alt="Flor de girasol mostrando la espiral de Fibonacci" class="flower-image">
+            `;
+            history = [...history.slice(0, historyIndex + 1), 'summary'];
+            historyIndex++;
+            toggleHistoryButtons();
+        }
+
+        function navigateHistory(direction) {
+            if (direction === 1 && historyIndex < history.length - 1) {
+                historyIndex++;
+            } else if (direction === -1 && historyIndex > 0) {
+                historyIndex--;
+            }
+
+            const section = history[historyIndex];
+            if (section === 'question') {
+                showQuestion();
+            } else if (section === 'game') {
+                setupGame();
+            } else if (section === 'summary') {
+                showSummary();
+            }
+            toggleHistoryButtons();
+        }
+
+        function toggleHistoryButtons() {
+            document.getElementById('prev-button').disabled = historyIndex === 0;
+            document.getElementById('next-button').disabled = historyIndex >= history.length - 1;
+        }
+
+        // Iniciar el juego
+        showQuestion();
+    </script>
+</body>
+</html>
